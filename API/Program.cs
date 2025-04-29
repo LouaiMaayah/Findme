@@ -6,6 +6,7 @@ builder.Services.AddCors(options =>
         policy => policy
             .WithOrigins("http://localhost:5173")  // your React app's URL
             .AllowAnyMethod()
+            .AllowCredentials()
             .AllowAnyHeader());
 });
 
@@ -13,6 +14,7 @@ builder.Services.AddCors(options =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 
 
 
@@ -49,6 +51,8 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast")
 .WithOpenApi();
+app.MapHub<LobbyHub>("/hubs/lobby");
+
 
 app.Run();
 

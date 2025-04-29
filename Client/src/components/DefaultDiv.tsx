@@ -3,10 +3,16 @@ interface DefaulrDivProps {
   height: number;
   text?: string;
   onClick?: () => void;
-  child?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-function DefaultDiv({ width, height, text, onClick, child }: DefaulrDivProps) {
+function DefaultDiv({
+  width,
+  height,
+  text,
+  onClick,
+  children: child,
+}: DefaulrDivProps) {
   return (
     <div
       style={{ width: width, height: height, ...styles.container }}
@@ -23,12 +29,13 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "20px",
     boxShadow: "0px 0px 20px rgba(0, 0, 0, 0.25)",
     display: "flex",
+    flexDirection: "column",
+    gap: "20px",
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     fontSize: "24px",
     fontFamily: "Arial, sans-serif",
-    fontWeight: "bold",
   },
 };
 
