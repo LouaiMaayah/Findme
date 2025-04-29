@@ -1,6 +1,5 @@
 import React, { useRef, useCallback } from "react";
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
-import { GOOGLE_MAPS_API_KEY } from "../consts";
 import { latlng } from "../types";
 import { Button } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
@@ -37,7 +36,7 @@ type BackgroundMapProps = {
 
 function MapComponent({ children }: BackgroundMapProps) {
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
 
   const mapRef = useRef<google.maps.Map | null>(null);

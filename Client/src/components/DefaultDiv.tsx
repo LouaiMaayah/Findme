@@ -1,14 +1,19 @@
 interface DefaulrDivProps {
   width: number;
   height: number;
-  text: string;
+  text?: string;
   onClick?: () => void;
+  child?: React.ReactNode;
 }
 
-function DefaultDiv({ width, height, text, onClick }: DefaulrDivProps) {
+function DefaultDiv({ width, height, text, onClick, child }: DefaulrDivProps) {
   return (
-    <div style={{ width: width, height: height, ...styles.container }}>
+    <div
+      style={{ width: width, height: height, ...styles.container }}
+      onClick={onClick}
+    >
       {text}
+      {child}
     </div>
   );
 }

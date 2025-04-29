@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\MyAPP.Api.csproj": {}
+    "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\MyAPP.Api.csproj": {
+    "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\MyAPP.Api.csproj",
-        "projectName": "MyAPP.Api",
-        "projectPath": "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\MyAPP.Api.csproj",
+        "projectUniqueName": "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\API.csproj",
+        "projectName": "API",
+        "projectPath": "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\API.csproj",
         "packagesPath": "C:\\Users\\louai\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\louai\\OneDrive\\Desktop\\Own_Projects\\Findme\\API\\obj\\",
         "projectStyle": "PackageReference",
@@ -46,6 +46,10 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.5, )"
+            },
+            "Microsoft.AspNetCore.SignalR": {
+              "target": "Package",
+              "version": "[1.2.0, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
