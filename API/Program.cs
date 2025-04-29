@@ -15,6 +15,11 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
+builder.Services.AddSingleton<LobbyManager>();
+builder.Services.AddControllers(); 
+
+
+
 
 
 
@@ -52,7 +57,7 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 app.MapHub<LobbyHub>("/hubs/lobby");
-
+app.MapControllers(); 
 
 app.Run();
 

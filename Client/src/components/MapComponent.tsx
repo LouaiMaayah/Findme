@@ -1,6 +1,6 @@
 import React, { useRef, useCallback } from "react";
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
-import { latlng } from "../types";
+import { Latlng } from "../types";
 import { Button } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 
@@ -10,7 +10,7 @@ const mapContainerStyle: React.CSSProperties = {
   position: "relative",
 };
 
-const center: latlng = {
+const center: Latlng = {
   lat: 0,
   lng: 0,
 };

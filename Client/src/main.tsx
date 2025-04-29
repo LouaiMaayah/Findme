@@ -5,6 +5,7 @@ import "./styles.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LobbyPage from "./pages/LobbyPage.tsx";
 import GamePage from "./pages/GamePage.tsx";
+import { UserProvider } from "./contexts/UserContext.tsx";
 
 const router = createBrowserRouter([
   { path: "/", element: <SignInPage /> },
@@ -14,6 +15,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router}></RouterProvider>
+    <UserProvider>
+      <RouterProvider router={router}></RouterProvider>
+    </UserProvider>
   </StrictMode>
 );

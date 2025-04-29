@@ -1,15 +1,14 @@
 import { useState } from "react";
 import DefaultDiv from "../components/DefaultDiv";
 import { Button, TextField } from "@mui/material";
-import { HubConnectionBuilder } from "@microsoft/signalr";
 import { useNavigate } from "react-router-dom";
+import { Lobby } from "../types";
 
 function LobbyPage() {
   const [lobbyState, setLobbyState] = useState<"lobby" | "create" | "join">(
     "lobby"
   );
   const [lobbyName, setLobbyName] = useState<string>("");
-  const [userName, setUserName] = useState<string>("");
   const navigate = useNavigate();
 
   if (lobbyState === "lobby") {
@@ -37,28 +36,21 @@ function LobbyPage() {
   }
 
   const handleCreateLobby = async () => {
-    try {
-      const connection = new HubConnectionBuilder()
-        .withUrl(`${import.meta.env.VITE_API_URL}/hubs/lobby`)
-        .withAutomaticReconnect()
-        .build();
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/lobbies`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      await connection.start();
-      const result = await connection.invoke(
-        "CreateLobby",
-        lobbyName,
-        userName
-      );
-
-      if (result) {
-        console.log("Lobby created successfully:", result);
-        navigate("/lobby/" + lobbyName);
-      } else {
-        alert("Lobby name already exists, please choose another one.");
-      }
-    } catch (error) {
-      console.error("Error creating lobby:", error);
+    const data = (await res.json()) as Lobby[];
+    const lobbyExists = data.some((lobby) => lobby.name === lobbyName);
+    if (lobbyExists) {
+      alert("Lobby name already exists. Please choose a different name.");
+      return;
     }
+
+    navigate("/lobby/" + lobbyName);
   };
 
   if (lobbyState === "create") {
@@ -66,14 +58,6 @@ function LobbyPage() {
       <div style={styles.container}>
         <DefaultDiv width={400} height={300} text="Enter your lobby name">
           <div style={styles.createGame}>
-            <TextField
-              label="User name"
-              variant="outlined"
-              style={{ margin: 0 }}
-              onChange={(e) => {
-                setUserName(e.target.value);
-              }}
-            />
             <TextField
               label="Lobby name"
               variant="outlined"
@@ -83,7 +67,7 @@ function LobbyPage() {
               }}
             />
           </div>
-          <Button variant="contained" onClick={() => handleCreateLobby()}>
+          <Button variant="contained" onClick={handleCreateLobby}>
             Start
           </Button>
         </DefaultDiv>
