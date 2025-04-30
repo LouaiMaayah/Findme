@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import { HubConnectionBuilder } from "@microsoft/signalr";
+import MapComponent from "../components/MapComponent";
+import Drawer from "../components/ui/Drawer";
 
 function GamePage() {
   const { lobbyName } = useParams();
@@ -48,19 +50,25 @@ function GamePage() {
     };
   }, []);
 
-  return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      {loading ? (
-        <>loading</>
-      ) : (
-        <>
-          {users.map((user) => {
-            return <div key={user}>{user}</div>;
-          })}
-        </>
-      )}
+  return loading ? (
+    <>loading</>
+  ) : (
+    <div style={styles.container}>
+      <MapComponent>
+        <Drawer></Drawer>
+      </MapComponent>
     </div>
   );
 }
 
 export default GamePage;
+
+const styles: Record<string, React.CSSProperties> = {
+  container: {
+    height: "100vh",
+    width: "100vw",
+    display: "flex",
+    flexDirection: "row",
+    backgroundImage: "url('../../../background.svg')",
+  },
+};

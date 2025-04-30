@@ -4,12 +4,6 @@ import { Latlng } from "../types";
 import { Button } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 
-const mapContainerStyle: React.CSSProperties = {
-  width: "100vw",
-  height: "100vh",
-  position: "relative",
-};
-
 const center: Latlng = {
   lat: 0,
   lng: 0,
@@ -49,29 +43,27 @@ function MapComponent({ children }: BackgroundMapProps) {
   if (!isLoaded) return <div>Loading Maps</div>;
 
   return (
-    <div>
-      <GoogleMap
-        mapContainerStyle={mapContainerStyle}
-        zoom={2.3}
-        center={center}
-        options={options}
-        onLoad={onMapLoad}
+    <GoogleMap
+      mapContainerStyle={styles.mapContainerStyle}
+      zoom={2.3}
+      center={center}
+      options={options}
+      onLoad={onMapLoad}
+    >
+      {children}
+      <Button
+        style={styles.iconButton}
+        variant="contained"
+        onClick={() => {
+          if (mapRef.current) {
+            mapRef.current.panTo(center);
+            mapRef.current.setZoom(2.3);
+          }
+        }}
       >
-        {children}
-        <Button
-          style={styles.iconButton}
-          variant="contained"
-          onClick={() => {
-            if (mapRef.current) {
-              mapRef.current.panTo(center);
-              mapRef.current.setZoom(2.3);
-            }
-          }}
-        >
-          <ReplayIcon />
-        </Button>
-      </GoogleMap>
-    </div>
+        <ReplayIcon />
+      </Button>
+    </GoogleMap>
   );
 }
 
@@ -80,6 +72,11 @@ const styles: Record<string, React.CSSProperties> = {
     position: "absolute",
     bottom: 20,
     right: 20,
+  },
+  mapContainerStyle: {
+    width: "100%",
+    height: "100%",
+    position: "relative",
   },
 };
 
