@@ -30,7 +30,6 @@ public class LobbyHub : Hub
 
     public async Task JoinLobby(string lobbyName, string username)
     {
-        _logger.LogInformation($"User {username} is trying to join lobby {lobbyName}");
         if (!_lobbyManager.LobbyExists(lobbyName))
         {
             await Clients.Caller.SendAsync("LobbyError", "Lobby does not exist.");
@@ -64,11 +63,14 @@ public class LobbyHub : Hub
         User? user = _lobbyManager.GetUserByConnectionId(Context.ConnectionId);
         if (user != null && user.lobby != null)
         {
-            _lobbyManager.LeaveLobby(user.lobby, user.username);
+            string lobbyName = user.lobby;
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, user.lobby);
+            _lobbyManager.LeaveLobby(user.lobby, user.username);
 
-            var users = _lobbyManager.GetUsersInLobby(user.lobby);
-            await Clients.Group(user.lobby).SendAsync("UserListUpdated", users);
+            _logger.LogInformation($"User {user.username} disconnected from lobby {user.lobby}.");
+
+            var users = _lobbyManager.GetUsersInLobby(lobbyName);
+            await Clients.Group(lobbyName).SendAsync("UserListUpdated", users);
         }
         await base.OnDisconnectedAsync(exception);
     }

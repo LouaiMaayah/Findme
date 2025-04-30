@@ -11,8 +11,8 @@ function LobbyPage() {
   );
   const [lobbyName, setLobbyName] = useState<string>("");
   const navigate = useNavigate();
-  const { setIsLobbyAdmin } = useUser();
-
+  const { setIsLobbyAdmin, username } = useUser();
+  console.log(username);
   const handleCreateLobby = async () => {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/lobbies`, {
       method: "GET",

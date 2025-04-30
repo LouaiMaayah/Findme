@@ -20,8 +20,10 @@ function GamePage() {
 
     connection
       .start()
+
       .then(async () => {
         connection.on("UserListUpdated", (userList: string[]) => {
+          console.log("UserListUpdated", userList);
           setUsers(userList);
         });
 
