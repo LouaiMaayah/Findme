@@ -28,8 +28,25 @@ function SignInForm({ style }: LoginProps) {
       />
       <Button
         variant="contained"
-        onClick={() => {
+        onClick={async () => {
           setUsername(name);
+          console.log(name);
+          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              username: name,
+              lobby: null,
+              connectionId: null,
+            }),
+          });
+
+          const data = await res.json();
+          console.log(data.message);
+
+          console.log(data);
           navigate("/lobby");
         }}
       >

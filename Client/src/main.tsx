@@ -1,4 +1,3 @@
-import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import SignInPage from "./pages/SignInPage.tsx";
 import "./styles.css";
@@ -14,9 +13,7 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <UserProvider>
-      <RouterProvider router={router}></RouterProvider>
-    </UserProvider>
-  </StrictMode>
+  <UserProvider>
+    <RouterProvider router={router}></RouterProvider>
+  </UserProvider>
 );

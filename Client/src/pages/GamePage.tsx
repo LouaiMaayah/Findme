@@ -1,37 +1,64 @@
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
+import { HubConnectionBuilder } from "@microsoft/signalr";
 
 function GamePage() {
   const { lobbyName } = useParams();
-  return <div style={{ width: "100vw", height: "100vh" }}>{lobbyName}</div>;
-}
+  const { username } = useUser();
+  const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<string[]>([]);
+  const { isLobbyAdmin } = useUser();
 
-export default GamePage;
-
-/*
-const handleCreateLobby = async () => {
-  try {
+  useEffect(() => {
     const connection = new HubConnectionBuilder()
       .withUrl(`${import.meta.env.VITE_API_URL}/hubs/lobby`)
       .withAutomaticReconnect()
       .build();
 
-    // Set up listeners BEFORE starting connection
-    connection.on("LobbyCreated", (lobbyNameFromServer) => {
-      console.log("Lobby created successfully:", lobbyNameFromServer);
-      navigate("/lobby/" + lobbyNameFromServer);
-    });
+    setLoading(true);
 
-    connection.on("LobbyError", (message) => {
-      alert(message); // e.g., "Lobby name already exists"
-    });
+    connection
+      .start()
+      .then(async () => {
+        connection.on("UserListUpdated", (userList: string[]) => {
+          setUsers(userList);
+        });
 
-    await connection.start();
+        if (isLobbyAdmin) {
+          await connection.invoke("CreateLobby", lobbyName, username);
+          await connection.invoke("JoinLobby", lobbyName, username);
+        } else {
+          await connection.invoke("JoinLobby", lobbyName, username);
+        }
 
-    // Call the method — don't expect a return, wait for the above messages
-    await connection.invoke("CreateLobby", lobbyName, userName);
-    await connection.stop();
-  } catch (error) {
-    console.error("Error creating lobby:", error);
-  }
-};
-*/
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("SignalR Connection Error:", error);
+      });
+
+    return () => {
+      connection
+        .invoke("LeaveLobby", lobbyName, username)
+        .catch((err) => console.error(err));
+      connection.stop().catch((err) => console.error(err));
+    };
+  }, []);
+
+  return (
+    <div style={{ width: "100vw", height: "100vh" }}>
+      {loading ? (
+        <>loading</>
+      ) : (
+        <>
+          {users.map((user) => {
+            return <div key={user}>{user}</div>;
+          })}
+        </>
+      )}
+    </div>
+  );
+}
+
+export default GamePage;

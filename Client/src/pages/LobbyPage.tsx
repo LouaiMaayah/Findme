@@ -3,6 +3,7 @@ import DefaultDiv from "../components/DefaultDiv";
 import { Button, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { Lobby } from "../types";
+import { useUser } from "../contexts/UserContext";
 
 function LobbyPage() {
   const [lobbyState, setLobbyState] = useState<"lobby" | "create" | "join">(
@@ -10,6 +11,44 @@ function LobbyPage() {
   );
   const [lobbyName, setLobbyName] = useState<string>("");
   const navigate = useNavigate();
+  const { setIsLobbyAdmin } = useUser();
+
+  const handleCreateLobby = async () => {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/lobbies`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = (await res.json()) as Lobby[];
+
+    console.log(data);
+    const lobbyExists = data.some((lobby) => lobby.name === lobbyName);
+    if (lobbyExists) {
+      alert("Lobby name already exists. Please choose a different name.");
+      return;
+    }
+    setIsLobbyAdmin(true);
+    navigate("/lobby/" + lobbyName);
+  };
+
+  const handleJoinLobby = async () => {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/lobbies`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = (await res.json()) as Lobby[];
+    const lobbyExists = data.some((lobby) => lobby.name === lobbyName);
+    if (lobbyExists) {
+      navigate("/lobby/" + lobbyName);
+    } else {
+      alert("Lobby does not exist. Please check the name and try again.");
+    }
+  };
 
   if (lobbyState === "lobby") {
     return (
@@ -34,24 +73,6 @@ function LobbyPage() {
       </div>
     );
   }
-
-  const handleCreateLobby = async () => {
-    const res = await fetch(`${import.meta.env.VITE_API_URL}/api/lobbies`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const data = (await res.json()) as Lobby[];
-    const lobbyExists = data.some((lobby) => lobby.name === lobbyName);
-    if (lobbyExists) {
-      alert("Lobby name already exists. Please choose a different name.");
-      return;
-    }
-
-    navigate("/lobby/" + lobbyName);
-  };
 
   if (lobbyState === "create") {
     return (
@@ -78,7 +99,21 @@ function LobbyPage() {
   if (lobbyState === "join") {
     return (
       <div style={styles.container}>
-        <DefaultDiv width={400} height={500} text="Join a Game" />
+        <DefaultDiv width={400} height={300} text="Enter lobby name">
+          <div style={styles.createGame}>
+            <TextField
+              label="lobby name"
+              variant="outlined"
+              style={{ margin: 0 }}
+              onChange={(e) => {
+                setLobbyName(e.target.value);
+              }}
+            />
+          </div>
+          <Button variant="contained" onClick={handleJoinLobby}>
+            Join
+          </Button>
+        </DefaultDiv>
       </div>
     );
   }
