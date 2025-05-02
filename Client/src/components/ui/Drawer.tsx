@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-function Drawer() {
+interface DrawerProps {
+  children?: React.ReactNode;
+  title: string;
+}
+
+function Drawer({ children, title }: DrawerProps) {
   const [isOpen, setIsOpen] = useState(true);
 
   const toggleDrawer = () => {
@@ -13,6 +18,8 @@ function Drawer() {
       <div style={styles.arrow} onClick={toggleDrawer}>
         {!isOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
       </div>
+      <h2>{title}</h2>
+      <div style={styles.children}>{children}</div>
     </div>
   );
 }
@@ -21,6 +28,7 @@ export default Drawer;
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
+    padding: 10,
     width: "20vw",
     height: "100vh",
     backgroundColor: "white",
@@ -28,6 +36,11 @@ const styles: Record<string, React.CSSProperties> = {
     position: "relative",
     transition: "all 0.5s",
     backgroundImage: "url('../../../background.svg')",
+    display: "flex",
+    flexDirection: "column",
+    color: "white",
+    textAlign: "center",
+    boxSizing: "border-box",
   },
   arrow: {
     position: "absolute",
@@ -43,5 +56,12 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "center",
     justifyContent: "center",
     opacity: 0.8,
+    color: "black",
+  },
+  children: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "10px",
+    marginTop: "20px",
   },
 };

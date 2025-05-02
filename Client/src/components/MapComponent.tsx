@@ -26,9 +26,10 @@ const options = {
 type BackgroundMapProps = {
   style?: React.CSSProperties;
   children?: React.ReactNode;
+  showPanToButton?: boolean;
 };
 
-function MapComponent({ children }: BackgroundMapProps) {
+function MapComponent({ children, showPanToButton }: BackgroundMapProps) {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
@@ -51,18 +52,20 @@ function MapComponent({ children }: BackgroundMapProps) {
       onLoad={onMapLoad}
     >
       {children}
-      <Button
-        style={styles.iconButton}
-        variant="contained"
-        onClick={() => {
-          if (mapRef.current) {
-            mapRef.current.panTo(center);
-            mapRef.current.setZoom(2.3);
-          }
-        }}
-      >
-        <ReplayIcon />
-      </Button>
+      {showPanToButton && (
+        <Button
+          style={styles.iconButton}
+          variant="contained"
+          onClick={() => {
+            if (mapRef.current) {
+              mapRef.current.panTo(center);
+              mapRef.current.setZoom(2.3);
+            }
+          }}
+        >
+          <ReplayIcon />
+        </Button>
+      )}
     </GoogleMap>
   );
 }

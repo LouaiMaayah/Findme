@@ -36,6 +36,12 @@ public class LobbyHub : Hub
             return;
         }
 
+        if (_lobbyManager.GetUsersInLobby(lobbyName).Count >= 8)
+        {
+            await Clients.Caller.SendAsync("LobbyError", "Lobby is full.");
+            return;
+        }
+
         _lobbyManager.JoinLobby(lobbyName, username, Context.ConnectionId);
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyName);
 

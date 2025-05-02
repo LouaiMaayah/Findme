@@ -4,11 +4,12 @@ import { useUser } from "../contexts/UserContext";
 import { HubConnectionBuilder } from "@microsoft/signalr";
 import MapComponent from "../components/MapComponent";
 import Drawer from "../components/ui/Drawer";
+import PlayerCards from "../components/PlayerCards";
 
 function GamePage() {
   const { lobbyName } = useParams();
   const { username } = useUser();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<string[]>([]);
   const { isLobbyAdmin } = useUser();
 
@@ -22,7 +23,6 @@ function GamePage() {
 
     connection
       .start()
-
       .then(async () => {
         connection.on("UserListUpdated", (userList: string[]) => {
           console.log("UserListUpdated", userList);
@@ -55,7 +55,13 @@ function GamePage() {
   ) : (
     <div style={styles.container}>
       <MapComponent>
-        <Drawer></Drawer>
+        <Drawer title={lobbyName!}>
+          {users.map((user) => {
+            return (
+              <PlayerCards playerName={user} playerScore={0}></PlayerCards>
+            );
+          })}
+        </Drawer>
       </MapComponent>
     </div>
   );
@@ -72,3 +78,8 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundImage: "url('../../../background.svg')",
   },
 };
+
+/*
+
+
+*/
