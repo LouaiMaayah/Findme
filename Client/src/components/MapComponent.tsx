@@ -9,7 +9,7 @@ const center: Latlng = {
   lng: 0,
 };
 
-const options = {
+const options: google.maps.MapOptions = {
   disableDefaultUI: true,
   restriction: {
     latLngBounds: {
@@ -27,9 +27,18 @@ type BackgroundMapProps = {
   style?: React.CSSProperties;
   children?: React.ReactNode;
   showPanToButton?: boolean;
+  onStreetViewPositionChange?: (position: Latlng) => void;
+  onStreetViewVisibleChange?: (visible: boolean) => void;
+  showPegMan?: boolean;
 };
 
-function MapComponent({ children, showPanToButton }: BackgroundMapProps) {
+function MapComponent({
+  children,
+  showPanToButton,
+  onStreetViewPositionChange: streetViewPositionChange,
+  onStreetViewVisibleChange: streetViewVisibleChange,
+  showPegMan,
+}: BackgroundMapProps) {
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
   });
@@ -38,6 +47,26 @@ function MapComponent({ children, showPanToButton }: BackgroundMapProps) {
 
   const onMapLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map;
+
+    const streetView = map.getStreetView();
+    streetView.setOptions({
+      disableDefaultUI: true,
+    });
+
+    streetView.addListener("visible_changed", () => {
+      const visible = streetView.getVisible();
+      if (streetViewVisibleChange) {
+        streetViewVisibleChange(visible);
+      }
+    });
+
+    // Listen for position changes while in Street View
+    streetView.addListener("position_changed", () => {
+      const position = streetView.getPosition();
+      if (position && streetViewPositionChange) {
+        streetViewPositionChange(position.toJSON() as Latlng);
+      }
+    });
   }, []);
 
   if (loadError) return <div>Error loading maps</div>;
@@ -48,7 +77,7 @@ function MapComponent({ children, showPanToButton }: BackgroundMapProps) {
       mapContainerStyle={styles.mapContainerStyle}
       zoom={2.3}
       center={center}
-      options={options}
+      options={{ ...options, streetViewControl: showPegMan }}
       onLoad={onMapLoad}
     >
       {children}

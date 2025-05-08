@@ -4,6 +4,7 @@ interface DefaulrDivProps {
   text?: string;
   onClick?: () => void;
   children?: React.ReactNode;
+  style?: React.CSSProperties;
 }
 
 function DefaultDiv({
@@ -12,10 +13,11 @@ function DefaultDiv({
   text,
   onClick,
   children: child,
+  style,
 }: DefaulrDivProps) {
   return (
     <div
-      style={{ width: width, height: height, ...styles.container }}
+      style={{ width: width, height: height, ...styles.container, ...style }}
       onClick={onClick}
     >
       {text}
@@ -36,6 +38,7 @@ const styles: Record<string, React.CSSProperties> = {
     backgroundColor: "rgba(255, 255, 255, 0.8)",
     fontSize: "24px",
     fontFamily: "Arial, sans-serif",
+    textAlign: "center",
   },
 };
 

@@ -14,7 +14,7 @@ function Drawer({ children, title }: DrawerProps) {
   };
 
   return (
-    <div style={{ ...styles.container, left: isOpen ? 0 : "-20vw" }}>
+    <div style={{ ...styles.container, left: isOpen ? 0 : "-15vw" }}>
       <div style={styles.arrow} onClick={toggleDrawer}>
         {!isOpen ? <ChevronRightIcon /> : <ChevronLeftIcon />}
       </div>
@@ -29,7 +29,7 @@ export default Drawer;
 const styles: Record<string, React.CSSProperties> = {
   container: {
     padding: 10,
-    width: "20vw",
+    width: "15vw",
     height: "100vh",
     backgroundColor: "white",
     backgroundSize: "cover",

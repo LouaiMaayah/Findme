@@ -118,4 +118,15 @@ public class LobbyManager
             return _users.ContainsKey(username);
         }
     }
+
+    public void StartGame(string lobbyName)
+    {
+        lock (_lobbies)
+        {
+            if (_lobbies.TryGetValue(lobbyName, out var lobby))
+            {
+                lobby.gameStarted = true;
+            }
+        }
+    }
 }

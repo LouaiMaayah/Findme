@@ -64,6 +64,18 @@ public class LobbyHub : Hub
         await Clients.Group(lobbyName).SendAsync("UserListUpdated", users);
     }
 
+    public async Task StartGame(string lobbyName)
+    {
+        if (!_lobbyManager.LobbyExists(lobbyName))
+        {
+            await Clients.Caller.SendAsync("LobbyError", "Lobby does not exist.");
+            return;
+        }
+
+        _lobbyManager.StartGame(lobbyName);
+        await Clients.Group(lobbyName).SendAsync("GameStarted", lobbyName);
+    }
+
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         User? user = _lobbyManager.GetUserByConnectionId(Context.ConnectionId);
