@@ -76,9 +76,24 @@ public class LobbyHub : Hub
         await Clients.Group(lobbyName).SendAsync("GameStarted", lobbyName);
     }
 
+    public async Task HidePlayer(string lobbyName, string username, LatLng hidingPlace)
+    {
+        if (!_lobbyManager.LobbyExists(lobbyName))
+        {
+            await Clients.Caller.SendAsync("LobbyError", "Lobby does not exist.");
+            return;
+        }
+
+        _lobbyManager.SetHidingPlace(lobbyName, username, hidingPlace);
+        await Clients.Group(lobbyName).SendAsync("PlayerHidden", username, hidingPlace);
+    }
+
+
+
+
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        User? user = _lobbyManager.GetUserByConnectionId(Context.ConnectionId);
+        Player? user = _lobbyManager.GetUserByConnectionId(Context.ConnectionId);
         if (user != null && user.lobby != null)
         {
             string lobbyName = user.lobby;
@@ -92,4 +107,6 @@ public class LobbyHub : Hub
         }
         await base.OnDisconnectedAsync(exception);
     }
+
+
 }

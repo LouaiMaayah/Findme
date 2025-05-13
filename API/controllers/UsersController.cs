@@ -19,7 +19,7 @@ public class usersController : ControllerBase
     }
 
     [HttpPost]
-    public IActionResult AddUser([FromBody] User request)
+    public IActionResult AddUser([FromBody] Player request)
     {
         if (_lobbyManager.AddUser(request.username, request.lobby, request.connectionId))
         {

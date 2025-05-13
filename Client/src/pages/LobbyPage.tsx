@@ -11,8 +11,8 @@ function LobbyPage() {
   );
   const [lobbyName, setLobbyName] = useState<string>("");
   const navigate = useNavigate();
-  const { setIsLobbyAdmin, username } = useUser();
-  console.log(username);
+  const { setIsLobbyAdmin } = useUser();
+
   const handleCreateLobby = async () => {
     const res = await fetch(`${import.meta.env.VITE_API_URL}/api/lobbies`, {
       method: "GET",
@@ -23,7 +23,6 @@ function LobbyPage() {
 
     const data = (await res.json()) as Lobby[];
 
-    console.log(data);
     const lobbyExists = data.some((lobby) => lobby.name === lobbyName);
     if (lobbyExists) {
       alert("Lobby name already exists. Please choose a different name.");

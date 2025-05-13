@@ -3,7 +3,7 @@
 public class LobbyManager
 {
     private readonly Dictionary<string, Lobby> _lobbies = new();
-    private readonly Dictionary<string, User> _users = new();
+    private readonly Dictionary<string, Player> _users = new();
 
     public bool CreateLobby(string lobbyName)
     {
@@ -62,7 +62,7 @@ public class LobbyManager
         }
     }
 
-    public User? GetUserByConnectionId(string connectionId)
+    public Player? GetUserByConnectionId(string connectionId)
     {
         lock (_users)
         {
@@ -80,18 +80,21 @@ public class LobbyManager
         return _lobbies.Values.ToList();
     }
 
-    public List<User> GetAllUsers()
+    public List<Player> GetAllUsers()
     {
         return _users.Values.ToList();
     }
 
-    public List<string> GetUsersInLobby(string lobbyName)
+    public List<Player> GetUsersInLobby(string lobbyName)
     {
-        if (_lobbies.TryGetValue(lobbyName, out var lobby))
+        lock (_lobbies)
         {
-            return lobby.users;
+            if (_lobbies.TryGetValue(lobbyName, out var lobby))
+            {
+                return lobby.users.Select(username => _users[username]).ToList();
+            }
+            return new List<Player>();
         }
-        return new List<string>();
     }
 
     public bool AddUser(string username, string? lobbyName, string? connectionId)
@@ -101,7 +104,7 @@ public class LobbyManager
             if (_users.ContainsKey(username))
                 return false;
 
-            _users[username] = new User
+            _users[username] = new Player
             {
                 username = username,
                 connectionId = connectionId,
@@ -126,6 +129,17 @@ public class LobbyManager
             if (_lobbies.TryGetValue(lobbyName, out var lobby))
             {
                 lobby.gameStarted = true;
+            }
+        }
+    }
+
+    public void SetHidingPlace(string lobbyName, string username, LatLng hidingPlace)
+    {
+        lock (_lobbies)
+        {
+            if (_lobbies.TryGetValue(lobbyName, out var lobby) && lobby.users.Contains(username))
+            {
+                _users[username].hidingPlace = hidingPlace;
             }
         }
     }

@@ -1,4 +1,9 @@
-import React, { useRef, useCallback } from "react";
+import React, {
+  useRef,
+  useCallback,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
 import { Latlng } from "../types";
 import { Button } from "@mui/material";
@@ -32,72 +37,91 @@ type BackgroundMapProps = {
   showPegMan?: boolean;
 };
 
-function MapComponent({
-  children,
-  showPanToButton,
-  onStreetViewPositionChange: streetViewPositionChange,
-  onStreetViewVisibleChange: streetViewVisibleChange,
-  showPegMan,
-}: BackgroundMapProps) {
-  const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
-  });
+export type MapComponentRef = {
+  toggleStreetView: () => void;
+  getStreetViewPosition: () => Latlng | null;
+};
 
-  const mapRef = useRef<google.maps.Map | null>(null);
-
-  const onMapLoad = useCallback((map: google.maps.Map) => {
-    mapRef.current = map;
-
-    const streetView = map.getStreetView();
-    streetView.setOptions({
-      disableDefaultUI: true,
+const MapComponent = forwardRef<MapComponentRef, BackgroundMapProps>(
+  (
+    {
+      children,
+      showPanToButton,
+      onStreetViewVisibleChange: streetViewVisibleChange,
+      showPegMan,
+    },
+    ref
+  ) => {
+    const { isLoaded, loadError } = useLoadScript({
+      googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     });
 
-    streetView.addListener("visible_changed", () => {
-      const visible = streetView.getVisible();
-      if (streetViewVisibleChange) {
-        streetViewVisibleChange(visible);
-      }
-    });
+    const mapRef = useRef<google.maps.Map | null>(null);
 
-    // Listen for position changes while in Street View
-    streetView.addListener("position_changed", () => {
-      const position = streetView.getPosition();
-      if (position && streetViewPositionChange) {
-        streetViewPositionChange(position.toJSON() as Latlng);
-      }
-    });
-  }, []);
+    const onMapLoad = useCallback((map: google.maps.Map) => {
+      mapRef.current = map;
 
-  if (loadError) return <div>Error loading maps</div>;
-  if (!isLoaded) return <div>Loading Maps</div>;
+      const streetView = map.getStreetView();
+      streetView.setOptions({
+        disableDefaultUI: true,
+      });
 
-  return (
-    <GoogleMap
-      mapContainerStyle={styles.mapContainerStyle}
-      zoom={2.3}
-      center={center}
-      options={{ ...options, streetViewControl: showPegMan }}
-      onLoad={onMapLoad}
-    >
-      {children}
-      {showPanToButton && (
-        <Button
-          style={styles.iconButton}
-          variant="contained"
-          onClick={() => {
-            if (mapRef.current) {
-              mapRef.current.panTo(center);
-              mapRef.current.setZoom(2.3);
-            }
-          }}
-        >
-          <ReplayIcon />
-        </Button>
-      )}
-    </GoogleMap>
-  );
-}
+      streetView.addListener("visible_changed", () => {
+        const visible = streetView.getVisible();
+        if (streetViewVisibleChange) {
+          streetViewVisibleChange(visible);
+        }
+      });
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+      toggleStreetView: () => {
+        if (mapRef.current) {
+          const streetView = mapRef.current.getStreetView();
+          const isVisible = streetView.getVisible();
+          streetView.setVisible(!isVisible);
+        }
+      },
+      getStreetViewPosition: () => {
+        if (mapRef.current) {
+          const streetView = mapRef.current.getStreetView();
+          const pos = streetView.getPosition();
+          return pos ? (pos.toJSON() as Latlng) : null;
+        }
+        return null;
+      },
+    }));
+
+    if (loadError) return <div>Error loading maps</div>;
+    if (!isLoaded) return <div>Loading Maps</div>;
+
+    return (
+      <GoogleMap
+        mapContainerStyle={styles.mapContainerStyle}
+        zoom={2.3}
+        center={center}
+        options={{ ...options, streetViewControl: showPegMan }}
+        onLoad={onMapLoad}
+      >
+        {children}
+        {showPanToButton && (
+          <Button
+            style={styles.iconButton}
+            variant="contained"
+            onClick={() => {
+              if (mapRef.current) {
+                mapRef.current.panTo(center);
+                mapRef.current.setZoom(2.3);
+              }
+            }}
+          >
+            <ReplayIcon />
+          </Button>
+        )}
+      </GoogleMap>
+    );
+  }
+);
 
 const styles: Record<string, React.CSSProperties> = {
   iconButton: {

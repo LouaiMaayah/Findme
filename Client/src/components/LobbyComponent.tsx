@@ -18,10 +18,6 @@ const LobbyComponent = () => {
       setLobbyId(id);
     });
 
-    newConnection.on("UserJoined", (lobbyId, userId) => {
-      console.log(`User ${userId} joined lobby ${lobbyId}`);
-    });
-
     return () => {
       newConnection.stop();
     };

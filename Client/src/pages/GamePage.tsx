@@ -2,26 +2,24 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
-import MapComponent from "../components/MapComponent";
+import MapComponent, { MapComponentRef } from "../components/MapComponent";
 import Drawer from "../components/ui/Drawer";
 import PlayerCards from "../components/PlayerCards";
 import DefaultDiv from "../components/DefaultDiv";
 import { Button, IconButton } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { Latlng } from "../types";
+import { Latlng, PlayerFromServer } from "../types";
 
 function GamePage() {
   const { lobbyName } = useParams();
   const { username, isLobbyAdmin } = useUser();
   const [loading, setLoading] = useState(false);
-  const [players, setPlayers] = useState<string[]>([]);
-  const [startGame, setStartGame] = useState(true);
+  const [players, setPlayers] = useState<PlayerFromServer[]>([]);
+  const [startGame, setStartGame] = useState(false);
   const navigate = useNavigate();
   const connectionRef = useRef<HubConnection | null>(null);
-  const [position, setPosition] = useState<Latlng | null>();
   const [streetViewVisible, setStreetViewVisible] = useState(false);
-
-  console.log(streetViewVisible, position);
+  const mapRef = useRef<MapComponentRef>(null);
 
   useEffect(() => {
     const connection = new HubConnectionBuilder()
@@ -35,16 +33,13 @@ function GamePage() {
     connection
       .start()
       .then(async () => {
-        connection.on("UserListUpdated", (userList: string[]) => {
+        connection.on("UserListUpdated", (userList: PlayerFromServer[]) => {
           setPlayers(userList);
         });
 
         if (isLobbyAdmin) {
-          await connection
-            .invoke("CreateLobby", lobbyName, username)
-            .then(async () => {
-              await connection.invoke("JoinLobby", lobbyName, username);
-            });
+          await connection.invoke("CreateLobby", lobbyName, username);
+          await connection.invoke("JoinLobby", lobbyName, username);
         } else {
           await connection.invoke("JoinLobby", lobbyName, username);
         }
@@ -53,6 +48,20 @@ function GamePage() {
           setStartGame(true);
         });
 
+        connection.on(
+          "PlayerHidden",
+          (playerName: string, hidingPlace: Latlng) => {
+            setPlayers((prevPlayers) =>
+              prevPlayers.map((player) => {
+                if (player.username === playerName) {
+                  return { ...player, hidingPlace };
+                }
+                return player;
+              })
+            );
+          }
+        );
+
         setLoading(false);
       })
       .catch((error) => {
@@ -60,21 +69,31 @@ function GamePage() {
       });
 
     return () => {
-      connection
-        .invoke("LeaveLobby", lobbyName, username)
-        .catch((err) => console.error(err));
-      connection.stop().catch((err) => console.error(err));
+      connection.off("UserListUpdated");
+      connection.off("GameStarted");
+      connection.off("PlayerHidden");
+      connection.invoke("LeaveLobby", lobbyName, username).catch(console.error);
+      connection.stop().catch(console.error);
     };
   }, []);
+
+  const handleHidePlayer = () => {
+    const hidingPosition = mapRef.current?.getStreetViewPosition();
+    if (!hidingPosition) return;
+    mapRef.current?.toggleStreetView();
+    connectionRef.current
+      ?.invoke("HidePlayer", lobbyName, username, hidingPosition)
+      .catch((err) => {
+        console.error(err);
+      });
+  };
 
   return loading ? (
     <>loading</>
   ) : (
     <div style={styles.container}>
       <MapComponent
-        onStreetViewPositionChange={(position: Latlng) => {
-          setPosition(position);
-        }}
+        ref={mapRef}
         onStreetViewVisibleChange={(visible) => {
           setStreetViewVisible(visible);
         }}
@@ -108,16 +127,27 @@ function GamePage() {
             )}
           </DefaultDiv>
         )}
-        <Drawer title={lobbyName!}>
-          {players.map((user) => {
-            return (
-              <PlayerCards playerName={user} playerScore={0}></PlayerCards>
-            );
-          })}
-        </Drawer>
+        {
+          <Drawer title={lobbyName!}>
+            {players.map((player) => {
+              return (
+                <PlayerCards
+                  hiding={player.hidingPlace === null}
+                  key={player.connectionId}
+                  playerName={player.username}
+                  playerScore={0}
+                />
+              );
+            })}
+          </Drawer>
+        }
       </MapComponent>
       {streetViewVisible && (
-        <Button variant="contained" style={styles.hideButton}>
+        <Button
+          variant="contained"
+          style={styles.hideButton}
+          onClick={handleHidePlayer}
+        >
           Hide here
         </Button>
       )}

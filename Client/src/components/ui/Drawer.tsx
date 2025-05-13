@@ -28,6 +28,7 @@ export default Drawer;
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
+    opacity: 0.9,
     padding: 10,
     width: "15vw",
     height: "100vh",

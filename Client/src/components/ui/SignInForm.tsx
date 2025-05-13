@@ -30,8 +30,8 @@ function SignInForm({ style }: LoginProps) {
         variant="contained"
         onClick={async () => {
           setUsername(name);
-          console.log(name);
-          const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
+
+          await fetch(`${import.meta.env.VITE_API_URL}/api/users`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -43,10 +43,6 @@ function SignInForm({ style }: LoginProps) {
             }),
           });
 
-          const data = await res.json();
-          console.log(data.message);
-
-          console.log(data);
           navigate("/lobby");
         }}
       >
