@@ -5,9 +5,10 @@ import React, {
   forwardRef,
 } from "react";
 import { GoogleMap, useLoadScript } from "@react-google-maps/api";
-import { Latlng } from "../types";
+import { Latlng, MarkerData } from "../types";
 import { Button } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
+import { Marker } from "@react-google-maps/api";
 
 const center: Latlng = {
   lat: 0,
@@ -35,6 +36,8 @@ type BackgroundMapProps = {
   onStreetViewPositionChange?: (position: Latlng) => void;
   onStreetViewVisibleChange?: (visible: boolean) => void;
   showPegMan?: boolean;
+  markers?: MarkerData[];
+  isInStreetView?: boolean;
 };
 
 export type MapComponentRef = {
@@ -49,6 +52,8 @@ const MapComponent = forwardRef<MapComponentRef, BackgroundMapProps>(
       showPanToButton,
       onStreetViewVisibleChange: streetViewVisibleChange,
       showPegMan,
+      markers,
+      isInStreetView,
     },
     ref
   ) => {
@@ -65,6 +70,10 @@ const MapComponent = forwardRef<MapComponentRef, BackgroundMapProps>(
       streetView.setOptions({
         disableDefaultUI: true,
       });
+
+      if (isInStreetView) {
+        streetView.setVisible(true);
+      }
 
       streetView.addListener("visible_changed", () => {
         const visible = streetView.getVisible();
@@ -103,6 +112,15 @@ const MapComponent = forwardRef<MapComponentRef, BackgroundMapProps>(
         options={{ ...options, streetViewControl: showPegMan }}
         onLoad={onMapLoad}
       >
+        {markers?.map((marker) => {
+          return (
+            <Marker
+              key={`${marker.position.lat}-${marker.position.lng}`}
+              position={marker.position}
+              icon={marker.icon}
+            />
+          );
+        })}
         {children}
         {showPanToButton && (
           <Button

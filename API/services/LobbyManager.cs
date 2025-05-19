@@ -15,7 +15,8 @@ public class LobbyManager
             _lobbies[lobbyName] = new Lobby
             {
                 name = lobbyName,
-                users = []
+                users = [],
+                gameState = GameState.GettingPlayers
 
             };
             return true;
@@ -140,6 +141,17 @@ public class LobbyManager
             if (_lobbies.TryGetValue(lobbyName, out var lobby) && lobby.users.Contains(username))
             {
                 _users[username].hidingPlace = hidingPlace;
+            }
+        }
+    }
+
+    public void UpdateGameState(string lobbyName, GameState gameState)
+    {
+        lock (_lobbies)
+        {
+            if (_lobbies.TryGetValue(lobbyName, out var lobby))
+            {
+                lobby.gameState = gameState;
             }
         }
     }

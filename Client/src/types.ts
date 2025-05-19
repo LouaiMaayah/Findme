@@ -14,3 +14,8 @@ export interface PlayerFromServer {
   lobby: string;
   hidingPlace?: Latlng;
 }
+
+export interface MarkerData {
+  position: Latlng;
+  icon: string;
+}

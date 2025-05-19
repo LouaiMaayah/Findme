@@ -8,18 +8,22 @@ import PlayerCards from "../components/PlayerCards";
 import DefaultDiv from "../components/DefaultDiv";
 import { Button, IconButton } from "@mui/material";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
-import { Latlng, PlayerFromServer } from "../types";
+import { Latlng, MarkerData, PlayerFromServer } from "../types";
 
 function GamePage() {
   const { lobbyName } = useParams();
   const { username, isLobbyAdmin } = useUser();
   const [loading, setLoading] = useState(false);
   const [players, setPlayers] = useState<PlayerFromServer[]>([]);
-  const [startGame, setStartGame] = useState(false);
   const navigate = useNavigate();
   const connectionRef = useRef<HubConnection | null>(null);
   const [streetViewVisible, setStreetViewVisible] = useState(false);
   const mapRef = useRef<MapComponentRef>(null);
+  const [markers, setMarkers] = useState<MarkerData[]>([]);
+  const [isInStreetView, setIsInStreetView] = useState(false);
+  const [gameState, setGameState] = useState<
+    "WaitingForAdminToStart" | "PlayersAreHiding" | "Started"
+  >("WaitingForAdminToStart");
 
   useEffect(() => {
     const connection = new HubConnectionBuilder()
@@ -43,10 +47,6 @@ function GamePage() {
         } else {
           await connection.invoke("JoinLobby", lobbyName, username);
         }
-
-        connection.on("GameStarted", () => {
-          setStartGame(true);
-        });
 
         connection.on(
           "PlayerHidden",
@@ -80,12 +80,21 @@ function GamePage() {
   const handleHidePlayer = () => {
     const hidingPosition = mapRef.current?.getStreetViewPosition();
     if (!hidingPosition) return;
-    mapRef.current?.toggleStreetView();
+    setIsInStreetView(false);
     connectionRef.current
       ?.invoke("HidePlayer", lobbyName, username, hidingPosition)
       .catch((err) => {
         console.error(err);
       });
+    setMarkers((prev) => {
+      return [
+        ...prev,
+        {
+          position: hidingPosition,
+          icon: "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+        },
+      ];
+    });
   };
 
   return loading ? (
@@ -94,10 +103,12 @@ function GamePage() {
     <div style={styles.container}>
       <MapComponent
         ref={mapRef}
+        isInStreetView={isInStreetView}
         onStreetViewVisibleChange={(visible) => {
           setStreetViewVisible(visible);
         }}
-        showPegMan={startGame}
+        showPegMan={true}
+        markers={markers}
       >
         <IconButton
           style={{ ...styles.leaveButtonStyle }}
@@ -107,7 +118,7 @@ function GamePage() {
         >
           <ExitToAppIcon />
         </IconButton>
-        {!startGame && (
+        {
           <DefaultDiv width={300} height={200} style={styles.gameStartDiv}>
             {isLobbyAdmin ? (
               <>
@@ -126,7 +137,7 @@ function GamePage() {
               "waiting for admin to start the game..."
             )}
           </DefaultDiv>
-        )}
+        }
         {
           <Drawer title={lobbyName!}>
             {players.map((player) => {
