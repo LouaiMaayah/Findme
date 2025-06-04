@@ -16,12 +16,15 @@
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "@react-google-maps/api": "^2.20.6",
+    "@vis.gl/react-google-maps": "^1.5.2",
+    "google-map-react": "^2.2.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.5.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/google-map-react": "^2.1.10",
     "@types/node": "^22.15.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",

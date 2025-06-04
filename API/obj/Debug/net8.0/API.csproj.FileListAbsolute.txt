@@ -40,3 +40,14 @@ C:\Users\louai\OneDrive\Desktop\Own_Projects\Findme\API\bin\Debug\net8.0\Microso
 C:\Users\louai\OneDrive\Desktop\Own_Projects\Findme\API\bin\Debug\net8.0\Microsoft.Extensions.Options.dll
 C:\Users\louai\OneDrive\Desktop\Own_Projects\Findme\API\bin\Debug\net8.0\Newtonsoft.Json.dll
 C:\Users\louai\OneDrive\Desktop\Own_Projects\Findme\API\bin\Debug\net8.0\System.Net.WebSockets.WebSocketProtocol.dll
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.csproj.AssemblyReference.cache
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.AssemblyInfoInputs.cache
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.AssemblyInfo.cs
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.csproj.CoreCompileInputs.cache
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.sourcelink.json
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.dll
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\refint\API.dll
+C:\Users\louai\OneDrive\Desktop\projects\Findme\API\obj\Debug\net8.0\API.pdb
